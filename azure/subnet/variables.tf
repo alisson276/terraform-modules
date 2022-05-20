@@ -4,6 +4,12 @@ variable "vnet_name" {
   default     = "acctvnet"
 }
 
+variable "create_network" {
+  description = "Create or not the Virtual Network"
+  type        = bool
+  default     = false
+}
+
 variable "resource_group_name" {
   description = "The name of an existing resource group to be imported."
   type        = string

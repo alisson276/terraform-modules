@@ -8,22 +8,23 @@ data "azurerm_resource_group" "network" {
 }
 
 locals {
-  virtual_network_name = var.vnet_name == "" ? azurerm_virtual_network.vnet.0.name : var.vnet_name
-}
-
-data "azurerm_virtual_network" "default" {
-  name                = local.virtual_network_name
-  resource_group_name = var.resource_group_name
+  virtual_network_name = var.create_network ? azurerm_virtual_network.vnet.0.name : var.vnet_name
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  count               = var.vnet_name == "" ? 1 : 0
+  count               = var.create_network ? 1 : 0
   name                = var.vnet_name
   resource_group_name = data.azurerm_resource_group.network.name
   location            = data.azurerm_resource_group.network.location
   address_space       = length(var.address_spaces) == 0 ? [var.address_space] : var.address_spaces
   dns_servers         = var.dns_servers
   tags                = var.tags
+}
+
+data "azurerm_virtual_network" "default" {
+  name                = local.virtual_network_name
+  resource_group_name = var.resource_group_name
+  depends_on          = [azurerm_virtual_network.vnet[0]]
 }
 
 resource "azurerm_subnet" "subnet" {
